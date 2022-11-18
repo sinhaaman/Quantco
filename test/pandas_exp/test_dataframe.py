@@ -248,17 +248,6 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
         },
         (0,2)
     ),
-    # (
-    #     {
-    #         'Name' : [],
-    #         'Number': []
-    #     }, [None, None],
-    #     {
-    #         'Name' : [],
-    #         'Number': []
-    #     },
-    #     (0,2)
-    # ),
     (
         {
             'Name': ["Test", "None", "QuantCo", None],
@@ -283,6 +272,18 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
         },
         (3,2)
     ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        [None, None, None, None],
+        {
+            'Name': [],
+            'Number': []
+        },
+        (0,2)
+    ),  
     (
         {
             'Name' : ["Test", "Test"],
@@ -319,18 +320,6 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
         },
         (0,2)
     ),
-    # (
-    #     {
-    #         'Name' : [],
-    #         'Number': []
-    #     }, 
-    #     QuantcoSeries("filter_series", [None, None]),
-    #     {
-    #         'Name' : [],
-    #         'Number': []
-    #     },
-    #     (0,2)
-    # ),
     (
         {
             'Name': ["Test", "None", "QuantCo", None],
@@ -354,6 +343,18 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Number': [1.2, 55.2, None]
         },
         (3,2)
+    ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        QuantcoSeries("filter_series", [None, None, None, None]),
+        {
+            'Name': [],
+            'Number': []
+        },
+        (0,2)
     )   
 ])
 def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list, expected_dict, expected_size):
@@ -368,3 +369,70 @@ def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list
     assert result.size() == expected_size
     for k,v in result.frame.items():
         assert result[k].series == expected_dict[k]
+
+@pytest.mark.parametrize("data_frame, series_list, exception, error_message",[
+    (
+        {
+            'Name' : [],
+            'Number': []
+        }, 
+        QuantcoSeries("filter_series", [None, None]),
+        QuantcoException,
+        "The length of the series and the filter list/series is not equal."
+    ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        QuantcoSeries("filter_series", [2,1,1,1]),
+        QuantcoException,
+        "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'int'>."
+    ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        QuantcoSeries("filter_series", ["2","1","1"]),
+        QuantcoException,
+        "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'str'>."
+    ),
+    (
+        {
+            'Name' : [],
+            'Number': []
+        }, 
+        [None, None],
+        QuantcoException,
+        "The length of the series and the filter list/series is not equal."
+    ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        [2,1,1,1],
+        QuantcoException,
+        "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'int'>."
+    ),
+    (
+        {
+            'Name' : ["Test", "Test1", "Test2", None],
+            'Number': [23.0, 34.8, 32.78, 98.343]
+        }, 
+        ["2","1","1"],
+        QuantcoException,
+        "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'str'>."
+    ),
+])
+def test_invalid_read_operator_with_list_for_quantcoframes(data_frame, series_list, exception, error_message):
+    # Given
+    quantoco_dataframe = QuantcoDataFrame(data_frame)
+
+    # When
+    with pytest.raises(exception) as e:
+        quantoco_dataframe[series_list]
+
+    # Then
+    assert e.value.args[0] == error_message
