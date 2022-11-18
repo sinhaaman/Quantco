@@ -15,17 +15,11 @@ class QuantcoDataFrame(object):
         return self._frame
     
     def __getitem__(self, key):
-        if type(key) == list:
-            filter_series = QuantcoSeries(key)
+        if type(key) == list or type(key) == QuantcoSeries:
+            filter_series = QuantcoSeries.convert_to_quantco_series(key, "filter_series")
             new_frame = dict()
             for k,v in self._frame.items():
                 new_frame[k] = v[filter_series]
-            return QuantcoDataFrame(new_frame)
-        
-        if type(key) == QuantcoSeries:
-            new_frame = dict()
-            for k,v in self._frame.items():
-                new_frame[k] = v[key]
             return QuantcoDataFrame(new_frame)
 
         return self._frame[key]
@@ -80,9 +74,3 @@ class QuantcoDataFrame(object):
     def __check_series_none__(self, name_of_series, list_to_check):
         if list_to_check is None:
             raise QuantcoException(f"The series with name: {name_of_series} can't be None.")
-
-        
-        
-        
-
-

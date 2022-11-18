@@ -4,6 +4,8 @@ from pandas_exp.exception import QuantcoException
 
 import pytest
 
+from pandas_exp.series import QuantcoSeries
+
 @pytest.mark.parametrize("data_frame, size", [
     ({
 
@@ -208,3 +210,161 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
 
     # Then
     assert e.value.args[0] == error_message
+
+@pytest.mark.parametrize("data_frame, series_list, expected_dict, expected_size", [
+    (
+        {
+            'Name' : ["Test", "Test"],
+            'Number': [0.1, 0.2]
+        }, 
+        [True, True],
+        {
+            'Name' : ["Test", "Test"],
+            'Number': [0.1, 0.2]
+        },
+        (2,2)
+    ),
+    (
+        {
+            'Name' : ["Test", "Test2"],
+            'Number' : [None, None]
+        }, 
+        [True, False],
+        {
+            'Name' : ["Test"],
+            'Number' : [None]
+        },
+        (1,2)
+    ),
+    (
+        {
+            'Name' : ["Test", None],
+            'Number': [0.1, 0.2]
+        }, 
+        [False, False],
+        {
+            'Name' : [],
+            'Number': []
+        },
+        (0,2)
+    ),
+    # (
+    #     {
+    #         'Name' : [],
+    #         'Number': []
+    #     }, [None, None],
+    #     {
+    #         'Name' : [],
+    #         'Number': []
+    #     },
+    #     (0,2)
+    # ),
+    (
+        {
+            'Name': ["Test", "None", "QuantCo", None],
+            'Number': [1.2, 3.2, 55.2, 88.90]
+        }, 
+        [True, None, False, True],
+        {
+            'Name': ["Test", None],
+            'Number': [1.2, 88.90]
+        },
+        (2,2)
+    ),
+    (
+        {
+            'Name': [False, None, None, False],
+            'Number': [1.2, 3.2, 55.2, None]
+        },
+        [True, None, True, True],
+        {
+            'Name': [False, None, False],
+            'Number': [1.2, 55.2, None]
+        },
+        (3,2)
+    ),
+    (
+        {
+            'Name' : ["Test", "Test"],
+            'Number': [0.1, 0.2]
+        }, 
+        QuantcoSeries("filter_series", [True, True]),
+        {
+            'Name' : ["Test", "Test"],
+            'Number': [0.1, 0.2]
+        },
+        (2,2)
+    ),
+    (
+        {
+            'Name' : ["Test", "Test2"],
+            'Number' : [None, None]
+        }, 
+        QuantcoSeries("filter_series",[True, False]),
+        {
+            'Name' : ["Test"],
+            'Number' : [None]
+        },
+        (1,2)
+    ),
+    (
+        {
+            'Name' : ["Test", None],
+            'Number': [0.1, 0.2]
+        }, 
+        QuantcoSeries("filter_series",[False, False]),
+        {
+            'Name' : [],
+            'Number': []
+        },
+        (0,2)
+    ),
+    # (
+    #     {
+    #         'Name' : [],
+    #         'Number': []
+    #     }, 
+    #     QuantcoSeries("filter_series", [None, None]),
+    #     {
+    #         'Name' : [],
+    #         'Number': []
+    #     },
+    #     (0,2)
+    # ),
+    (
+        {
+            'Name': ["Test", "None", "QuantCo", None],
+            'Number': [1.2, 3.2, 55.2, 88.90]
+        }, 
+        QuantcoSeries("filter_series", [True, None, False, True]),
+        {
+            'Name': ["Test", None],
+            'Number': [1.2, 88.90]
+        },
+        (2,2)
+    ),
+    (
+        {
+            'Name': [False, None, None, False],
+            'Number': [1.2, 3.2, 55.2, None]
+        },
+        QuantcoSeries("filter_series", [True, None, True, True]),
+        {
+            'Name': [False, None, False],
+            'Number': [1.2, 55.2, None]
+        },
+        (3,2)
+    )   
+])
+def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list, expected_dict, expected_size):
+    # Given
+    quantoco_dataframe = QuantcoDataFrame(data_frame)
+
+    # When
+    result = quantoco_dataframe[series_list]
+
+    # Then
+    assert type(result) == QuantcoDataFrame
+    assert result.size() == expected_size
+    for k,v in result.frame.items():
+        assert result[k].series == expected_dict[k]
