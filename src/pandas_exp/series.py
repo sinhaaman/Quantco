@@ -40,6 +40,8 @@ class QuantcoSeries(object):
         list_type = type(None)
         if list_to_check is None:
             raise QuantcoException(f"The series can't be None")
+        if type(list_to_check) != list:
+            raise QuantcoException(f"A valid list was not provided to construct the series.")
         for i in range(0, len(list_to_check)):
             if type(list_to_check[i]) not in self.allowed_data_types:
                 raise QuantcoException(f"The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float.")
@@ -98,9 +100,6 @@ class QuantcoSeries(object):
     def __lt__(self, operand, **kwargs):
         return QuantcoSeries([elem < operand for elem in self._series ])
     
-    def __eq__(self, operand, **kwargs):
-        return QuantcoSeries([elem == operand for elem in self._series ])
-    
     def __ne__(self, operand, **kwargs):
         return QuantcoSeries([elem != operand for elem in self._series ])
     
@@ -139,10 +138,18 @@ class QuantcoSeries(object):
         else:
             raise QuantcoException(f"The invert operation of the series with type {self._type} is not supported.")
     
-    def convert_to_quantco_series(operand_list, **kwargs):
-        operand_list_type = type(operand_list)
+    def __eq__(self, __o: object) -> bool:
+        __o = QuantcoSeries.convert_to_quantco_series(__o)
+        if __o.type != self.type:
+            raise QuantcoException(f"The series types are not same. The series are of types: {self._type} and {__o.type}.")
+        if len(__o.series) != len(self._series):
+            raise QuantcoException(f"The length of series are not equal. The series are of length {len(self._series)} and {len(__o.series)}.")
+        return __o.series == self._series
+    
+    def convert_to_quantco_series(__o:object, **kwargs):
+        operand_list_type = type(__o)
         if operand_list_type != list and operand_list_type != QuantcoSeries:
             raise QuantcoException(f"The operand list provided in not of type list or QuantcoSeries.")
         if operand_list_type == list:
-            operand_list = QuantcoSeries(operand_list)
-        return operand_list
+            __o = QuantcoSeries(__o)
+        return __o

@@ -61,8 +61,7 @@ def test_invalid_series(series_name, series, error_message):
 
 @pytest.mark.parametrize("series_name, series, setter_attr, setter_value",[
     ("Test_Series", [False, True, None, True], "series", ["Test"]),
-    ("Test_Series", ["Test, Test1"], "type", float),
-    ("Test_Series", [1.0, 2.0, None], "series_name", "Test_Series_1")
+    ("Test_Series", ["Test, Test1"], "type", float)
 ])
 def test_setter_for_series(series_name, series, setter_attr, setter_value):
     # Given
@@ -138,7 +137,7 @@ def test_invalid_arithmetic_operations_on_series(series_name:str, series:List[An
     invalid_operations_on_series(series_name, series, operand, operators, exception_type, error_message)
 
 comparison_operator_list = [ge, gt, le, lt]
-equality_comparison_operator_list = [eq, ne]
+equality_comparison_operator_list = [ne]
 @pytest.mark.parametrize("series_name, series, operand, operators",[
     ("Float series, comparison with int operation", [1.0, 2.0, 3.0], 5, comparison_operator_list + equality_comparison_operator_list),
     ("Float series, comparison with float operation", [1.0, 2.0, 3.0], 5.0, comparison_operator_list + equality_comparison_operator_list),
@@ -153,17 +152,49 @@ equality_comparison_operator_list = [eq, ne]
 def test_valid_comparison_operations_on_series(series_name, series, operand, operators):
     valid_operations_on_series(series_name, series, operand, operators)
 
-@pytest.mark.parametrize("series_name, series, operand, operators",[
-    ("Float series with None, comparison with int operation", [1.0, 2.0, 3.0, None], 5, equality_comparison_operator_list),
-    ("Float series with None, comparison with float operation", [1.0, 2.0, 3.0, None], 5.0, equality_comparison_operator_list),
-    ("Float series with None, comparison with string operation", [1.0, 2.0, 3.0, None], "Test", equality_comparison_operator_list),
-    ("String series with None, comparison with None operation", ["Test", "Test1", "Test", None], None, equality_comparison_operator_list),
-    ("String series with None, comparison with Boolean operation", ["Test", "Test1", "Test", None], True, equality_comparison_operator_list),
-    ("Series with None, comparison with None operation", [None, None, None, None], None, equality_comparison_operator_list)
+@pytest.mark.parametrize("series_name, series, other_series, expectation",[
+    ("Float series with None, comparison with float list", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None], True),
+    ("Int series", [1, 2, 3, 4, None], [1, 2, 3, 4, None], True),
+    ("None series comparison with None series", [None], [None], True),
+    ("None series comparison with None series", [1.0, 2.0, 3.0, None], [1.0, 2.0, 4.0, None], False),
+    ("None series comparison with None series", [1, 2, 3, None], [1, 2, 4, None], False),
+    ("None series comparison with None series", [True, True], [True, None], False)
 ])
-def test_valid_equality_operations_on_series(series_name, series, operand, operators):
-    valid_operations_on_series(series_name, series, operand, operators)
+def test_valid_equality_on_series(series_name, series, other_series, expectation):
+    # Given
+    quantco_series = QuantcoSeries(series)
+    other_quantco_series = QuantcoSeries(other_series)
 
+    # When
+    list_result = quantco_series == other_series
+    series_result = quantco_series == other_quantco_series
+
+    # Then
+    assert list_result == expectation
+    assert series_result == expectation
+
+@pytest.mark.parametrize("series_name, series, other_series, exception, error_message",[
+    ("String series with None, comparison with None operation", ["Test", "Test1", "Test", None], None, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
+    ("String series with None, comparison with Boolean operation", ["Test", "Test1", "Test", None], True, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
+    ("Series with None, comparison with None operation", [None, None, None, None], None, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
+    ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of series are not equal. The series are of length 4 and 5."),
+    ("Float series with None, comparison with int list", [1.0, 2.0, 3.0, None], [1, 2, 3, None], QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'int'>."),
+    ("Float series with None, comparison with String list", [1.0, 2.0, 3.0, None], ["1", None], QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'str'>."),
+    ("Boolean series with None, comparison with string operation", [True, False, None], ["True", "False"], QuantcoException, "The series types are not same. The series are of types: <class 'bool'> and <class 'str'>."),
+    ("String series with None, comparison with boolean series", ["True", "False", "True", "False", None], [True, True, True, True, True], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'bool'>."),
+    ("String series filtered with None", ["True", "False", "True", "False", None], [None, None, None, None, None], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'NoneType'>."),
+    ("None series", [None, None, None, None], [True, False, False, False], QuantcoException, "The series types are not same. The series are of types: <class 'NoneType'> and <class 'bool'>.")
+])
+def test_invalid_equality_on_series(series_name, series, other_series, exception, error_message):
+    # Given
+    quantco_series = QuantcoSeries(series)
+
+    # When
+    with pytest.raises(exception) as list_exception:
+        quantco_series == other_series
+    
+    # Then
+    assert list_exception.value.args[0] == error_message
 
 @pytest.mark.parametrize("series_name, series, operand, operators, exception_type, error_message",[
     ("Float series, comparison with string operation", [1.0, 2.0, 3.0], "Test", comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'float' and 'str'"),
