@@ -173,14 +173,52 @@ equality_comparison_operator_list = [ne]
     ("Int series, commparison with float operation", [1, 2, 3], 5.0, comparison_operator_list + equality_comparison_operator_list),
     ("Int series, comparison with int operation", [1, 2, 3], 5, comparison_operator_list + equality_comparison_operator_list),
     ("Float series, comparison with negative operation", [1.0, 2.0, 3.0], -5.0, comparison_operator_list + equality_comparison_operator_list),
-    ("String series, comparison with string operation", ["Test, Test2"], "1", comparison_operator_list + equality_comparison_operator_list),
+    ("String series, comparison with string operation", ["Test", "Test2"], "1", comparison_operator_list + equality_comparison_operator_list),
     ("Empty list, comparison with int operation", [], 5, comparison_operator_list + equality_comparison_operator_list),
     ("Empty list with None operation", [], None, comparison_operator_list + equality_comparison_operator_list),
     ("Empty list, comparison with None operation", [], None, comparison_operator_list + equality_comparison_operator_list),
-    ("Float series, comparison with boolean operation", [1.0, 2.0, 3.0], True, comparison_operator_list + equality_comparison_operator_list)
+    ("Float series, comparison with boolean operation", [1.0, 2.0, 3.0], True, comparison_operator_list + equality_comparison_operator_list),
+    ("Float series, comparison with int operation, series", [1.0, 2.0, 3.0], QuantcoSeries([1,2,3]), comparison_operator_list + equality_comparison_operator_list),
+    ("Float series, comparison with float operation, series", [1.0, 2.0, 3.0], QuantcoSeries([5.0] * 3), comparison_operator_list + equality_comparison_operator_list),
+    ("Int series, commparison with float operation, series", [1, 2, 3], QuantcoSeries([5.0] * 3), comparison_operator_list + equality_comparison_operator_list),
+    ("Int series, comparison with int operation, series", [1, 2, 3], QuantcoSeries([5] * 3), comparison_operator_list + equality_comparison_operator_list),
+    ("Float series, comparison with negative operation, series", [1.0, 2.0, 3.0], QuantcoSeries([-5.0] * 3), comparison_operator_list + equality_comparison_operator_list),
+    ("String series, comparison with string operation, series", ["Test", "Test2"], QuantcoSeries(["1"] * 2), comparison_operator_list + equality_comparison_operator_list),
+    ("Empty list, comparison with int operation, series", [], QuantcoSeries([5]), comparison_operator_list + equality_comparison_operator_list),
+    ("Empty list with None operation, series", [], QuantcoSeries([None]), comparison_operator_list + equality_comparison_operator_list),
+    ("Empty list, comparison with None operation, series", [], QuantcoSeries([]), comparison_operator_list + equality_comparison_operator_list),
+    ("Float series, comparison with boolean operation, series", [1.0, 2.0, 3.0], QuantcoSeries([True]*3), comparison_operator_list + equality_comparison_operator_list)
 ])
 def test_valid_comparison_operations_on_series(series_name, series, operand, operators):
     valid_operations_on_series(series_name, series, operand, operators)
+
+@pytest.mark.parametrize("series_name, series, operand, operators, exception_type, error_message",[
+    ("Float series, comparison with string operation", [1.0, 2.0, 3.0], "Test", comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'float' and 'str'"),
+    ("String series, comparison with float operation", ["Test", "Test1"], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'float'"),
+    ("String series, comparison with None operation", ["Test", "Test1"], None, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'NoneType'"),
+    ("Boolean series, comparison with Boolean operation", [True, False, None], False, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'bool'"),
+    ("Boolean series, comparison with None operation", [True, False, None], None, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'bool' and 'NoneType'"),
+    ("Float series with None, comparison with int operation", [1.0, 2.0, 3.0, None], 2, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Float series with None, comparison with float operation", [1.0, 2.0, 3.0, None], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
+    ("Int series with None, comparison with int operation", [None, 1, 3, None], 2, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Int series with None, comparison with float operation", [None, 1, 3, None], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
+    ("None series, comparison with String operation", [None, None], "1", comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'str'"),
+    ("None series, comparison with int operation", [None, None], 1, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Float series, comparison with string operation, series", [1.0, 2.0, 3.0], QuantcoSeries(["Test"] * 3), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'float' and 'str'"),
+    ("String series, comparison with float operation, series", ["Test", "Test1"], QuantcoSeries([2.0] * 2), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'float'"),
+    ("String series, comparison with None operation, series", ["Test", "Test1"], QuantcoSeries([None] * 2), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'NoneType'"),
+    ("Boolean series, comparison with Boolean operation, series", [True, False, None], QuantcoSeries([False] * 3), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'bool'"),
+    ("Boolean series, comparison with None operation, series", [True, False, None], QuantcoSeries([None] * 3), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'bool' and 'NoneType'"),
+    ("Float series with None, comparison with int operation, series", [1.0, 2.0, 3.0, None], QuantcoSeries([2] * 4), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Float series with None, comparison with float operation, series", [1.0, 2.0, 3.0, None], QuantcoSeries([2.0] * 4), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
+    ("Int series with None, comparison with int operation, series", [None, 1, 3, None], QuantcoSeries([2] * 4), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Int series with None, comparison with float operation, series", [None, 1, 3, None], QuantcoSeries([2.0] * 4), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
+    ("None series, comparison with String operation, series", [None, None], QuantcoSeries(["1"] * 2), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'str'"),
+    ("None series, comparison with int operation, series", [None, None], QuantcoSeries([1] * 2), comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
+    ("Float series, comparison with int operation, series unequal length", [1.0, 2.0, 3.0], QuantcoSeries([1,2,3,4]), comparison_operator_list + equality_comparison_operator_list, QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 3"),
+])
+def test_invalid_comparison_operations_on_series(series_name:str, series:List[Any], operand:Any, operators:List[Any], exception_type:Exception, error_message:str):
+    invalid_operations_on_series(series_name, series, operand, operators, exception_type, error_message)
 
 @pytest.mark.parametrize("series_name, series, other_series, expectation",[
     ("Float series with None, comparison with float list", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None], True),
@@ -225,22 +263,6 @@ def test_invalid_equality_on_series(series_name, series, other_series, exception
     
     # Then
     assert list_exception.value.args[0] == error_message
-
-@pytest.mark.parametrize("series_name, series, operand, operators, exception_type, error_message",[
-    ("Float series, comparison with string operation", [1.0, 2.0, 3.0], "Test", comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'float' and 'str'"),
-    ("String series, comparison with float operation", ["Test", "Test1"], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'float'"),
-    ("String series, comparison with None operation", ["Test", "Test1"], None, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'str' and 'NoneType'"),
-    ("Boolean series, comparison with Boolean operation", [True, False, None], False, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'bool'"),
-    ("Boolean series, comparison with None operation", [True, False, None], None, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'bool' and 'NoneType'"),
-    ("Float series with None, comparison with int operation", [1.0, 2.0, 3.0, None], 2, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
-    ("Float series with None, comparison with float operation", [1.0, 2.0, 3.0, None], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
-    ("Int series with None, comparison with int operation", [None, 1, 3, None], 2, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'"),
-    ("Int series with None, comparison with float operation", [None, 1, 3, None], 2.0, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'float'"),
-    ("None series, comparison with String operation", [None, None], "1", comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'str'"),
-    ("None series, comparison with int operation", [None, None], 1, comparison_operator_list, TypeError, "'{operator_symbol}' not supported between instances of 'NoneType' and 'int'")
-])
-def test_invalid_comparison_operations_on_series(series_name:str, series:List[Any], operand:Any, operators:List[Any], exception_type:Exception, error_message:str):
-    invalid_operations_on_series(series_name, series, operand, operators, exception_type, error_message)
 
 # Checking for boolean operation on the series
 bitwise_binary_operator_list = [and_, or_, xor]

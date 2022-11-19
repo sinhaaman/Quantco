@@ -66,12 +66,16 @@ class QuantcoSeries(object):
         elif self._type != type(None) and operand_type != self._type:
             raise QuantcoException(f"The operand type {operand_type} is not compatible with the series type {self._type}.")
     
+    def __convert_object_to_quantco_series__(self, __o):
+        object_type = type(__o)
+        if object_type != list and object_type != QuantcoSeries:
+            __o = QuantcoSeries.convert_to_quantco_series([__o] * len(self._series))
+        if (len(__o) != len(self._series)) and (__o.type != type(None) and self._type != type(None)):
+            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(__o)} and {len(self)}")
+        return __o
+
     def __convert_arithmetric_operand__(self, operand):
-        operand_type = type(operand)
-        if operand_type != list and operand_type != QuantcoSeries:
-            operand = QuantcoSeries.convert_to_quantco_series([operand] * len(self._series))
-        if (len(operand) != len(self._series)) and (operand.type != type(None) and self._type != type(None)):
-            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(operand)} and {len(self)}")
+        operand = self.__convert_object_to_quantco_series__(operand)
         self.__check_arithmetic_compatibility__(operand.type)
         return operand
 
@@ -95,22 +99,26 @@ class QuantcoSeries(object):
         return QuantcoSeries([self._series[i] / operand[i] for i in range(len(self._series))])
     
     # Comparison operations overloading:
-    # Should work on Series operand also
     
     def __ge__(self, operand, **kwargs):
-        return QuantcoSeries([elem >= operand for elem in self._series ])
+        operand = self.__convert_object_to_quantco_series__(operand)
+        return QuantcoSeries([self._series[i] >= operand[i] for i in range(len(self._series))])
     
     def __gt__(self, operand, **kwargs):
-        return QuantcoSeries([elem > operand for elem in self._series ])
+        operand = self.__convert_object_to_quantco_series__(operand)
+        return QuantcoSeries([self._series[i] > operand[i] for i in range(len(self._series))])
     
     def __le__(self, operand, **kwargs):
-        return QuantcoSeries([elem <= operand for elem in self._series ])
+        operand = self.__convert_object_to_quantco_series__(operand)
+        return QuantcoSeries([self._series[i] <= operand[i] for i in range(len(self._series))])
     
     def __lt__(self, operand, **kwargs):
-        return QuantcoSeries([elem < operand for elem in self._series ])
+        operand = self.__convert_object_to_quantco_series__(operand)
+        return QuantcoSeries([self._series[i] < operand[i] for i in range(len(self._series))])
     
     def __ne__(self, operand, **kwargs):
-        return QuantcoSeries([elem != operand for elem in self._series ])
+        operand = self.__convert_object_to_quantco_series__(operand)
+        return QuantcoSeries([self._series[i] != operand[i] for i in range(len(self._series))])
     
     # List comptabile function overloading:
     def __check_boolean_operator_compatibility__(self, operand_list, **kwargs):
