@@ -56,8 +56,9 @@ class QuantcoSeries(object):
     # Should work on Series operand also
     def __check_arithmetic_compatibility__(self, operand_type, **kwargs):
         arithmetic_types = {int, float}
-        if operand_type == type(None):
-            raise QuantcoException(f"The operand type {operand_type} is not supported.")
+        # Uncomment lines 60-61 to not support arithmetic operations on NoneType.
+        # if operand_type == type(None):
+        #     raise QuantcoException(f"The operand type {operand_type} is not supported.")
         if self._type in arithmetic_types:
             if operand_type not in arithmetic_types:
                 raise QuantcoException("The type of provided input is not an int or float.")
@@ -65,25 +66,34 @@ class QuantcoSeries(object):
             raise QuantcoException("Addition on the bool type is not supported.")
         elif self._type != type(None) and operand_type != self._type:
             raise QuantcoException(f"The operand type {operand_type} is not compatible with the series type {self._type}.")
+    
+    def __convert_arithmetric_operand__(self, operand):
+        operand_type = type(operand)
+        if operand_type != list and operand_type != QuantcoSeries:
+            operand = QuantcoSeries.convert_to_quantco_series([operand] * len(self._series))
+        if (len(operand) != len(self._series)) and (operand.type != type(None) and self._type != type(None)):
+            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(operand)} and {len(self)}")
+        self.__check_arithmetic_compatibility__(operand.type)
+        return operand
 
     def __add__(self, operand, **kwargs):
-        self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries([elem + operand for elem in self._series])
+        operand = self.__convert_arithmetric_operand__(operand)
+        return QuantcoSeries([self._series[i] + operand[i] for i in range(len(self._series))])
     
     def __sub__(self, operand, **kwargs):
-        self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries([elem - operand for elem in self._series])
+        operand = self.__convert_arithmetric_operand__(operand)
+        return QuantcoSeries([self._series[i] - operand[i] for i in range(len(self._series))])
     
     def __mul__(self, operand, **kwargs):
-        self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries([elem * operand for elem in self._series])
+        operand = self.__convert_arithmetric_operand__(operand)
+        return QuantcoSeries([self._series[i] * operand[i] for i in range(len(self._series))])
     
     def __truediv__(self, operand, **kwargs):
         return self.__div__(operand)
 
     def __div__(self, operand, **kwargs):
-        self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries([elem / operand for elem in self._series])
+        operand = self.__convert_arithmetric_operand__(operand)
+        return QuantcoSeries([self._series[i] / operand[i] for i in range(len(self._series))])
     
     # Comparison operations overloading:
     # Should work on Series operand also
