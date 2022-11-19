@@ -131,9 +131,9 @@ def test_valid_arithmetic_operations_on_series(series_name, series, operand, ope
     ("Float series with none float operation", [1.0, 2.0, 3.0, None], 2.0, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'float'"),
     ("Int series with none int operation", [None, 1, 3, None], 2, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
     ("Int series with none float operation", [None, 1, 3, None], 2.0, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'float'"),
-    ("String series with String operation", ["Test, Test2"], "1", [sub, truediv], TypeError, "unsupported operand type(s) for {operator_symbol}: 'str' and 'str'"),
+    ("String series with String operation", ["Test", "Test2"], "1", [sub, truediv], TypeError, "unsupported operand type(s) for {operator_symbol}: 'str' and 'str'"),
     ("None series with String operation", [None, None], "1", [sub, truediv], TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'str'"),
-    ("String series with String multiplication", ["Test, Test2"], "1", [mul], TypeError, "can't multiply sequence by non-int of type 'str'"),
+    ("String series with String multiplication", ["Test", "Test2"], "1", [mul], TypeError, "can't multiply sequence by non-int of type 'str'"),
     ("None series with String multiplication", [None, None], "1", [mul], TypeError, "can't multiply sequence by non-int of type 'NoneType'"),
     ("None series with int operation", [None, None], 1, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'")
 ])
