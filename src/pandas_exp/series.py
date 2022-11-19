@@ -53,12 +53,11 @@ class QuantcoSeries(object):
         return list_type
 
     # Arithmetic operations overloading:
-    # Should work on Series operand also
     def __check_arithmetic_compatibility__(self, operand_type, **kwargs):
         arithmetic_types = {int, float}
-        # Uncomment lines 60-61 to not support arithmetic operations on NoneType.
-        # if operand_type == type(None):
-        #     raise QuantcoException(f"The operand type {operand_type} is not supported.")
+        # Comment lines 60-61 to support arithmetic operations on NoneType.
+        if operand_type == type(None):
+            raise QuantcoException(f"The operand type {operand_type} is not supported.")
         if self._type in arithmetic_types:
             if operand_type not in arithmetic_types:
                 raise QuantcoException("The type of provided input is not an int or float.")

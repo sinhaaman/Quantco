@@ -110,14 +110,15 @@ arithmetic_operation_list = [add, sub, mul, truediv]
     ("Int series int operation  ", [1, 2, 3], 5, arithmetic_operation_list),
     ("Float series negative operation", [1.0, 2.0, 3.0], -5.0, arithmetic_operation_list),
     ("String series with String operation", ["Test, Test2"], "1", [add]),
-    ("Empty list with int operation", [], 5, arithmetic_operation_list),
-    ("Empty list with int operation", [], QuantcoSeries([5]), arithmetic_operation_list),
     ("Float series int operation", [1.0, 2.0, 3.0], QuantcoSeries([5.0, 5.0, 5.0]), arithmetic_operation_list),
     ("Float series float operation", [1.0, 2.0, 3.0], QuantcoSeries([5.0, 5.0, 5.0]), arithmetic_operation_list),
     ("Int series float operation", [1, 2, 3], QuantcoSeries([5.0, 5.0, 5.0]), arithmetic_operation_list),
     ("Int series int operation  ", [1, 2, 3], QuantcoSeries([5, 5, 5]), arithmetic_operation_list),
     ("Float series negative operation", [1.0, 2.0, 3.0], QuantcoSeries([-5.0, -5.0, -5.0]), arithmetic_operation_list),
-    ("String series with String operation", ["Test1", "Test2"], QuantcoSeries(["1", "1"]), [add])
+    ("String series with String operation", ["Test1", "Test2"], QuantcoSeries(["1", "1"]), [add]),
+    # Uncomment to enable arithmetic operations on NoneType
+    #("Empty list with int operation", [], 5, arithmetic_operation_list),
+    #("Empty list with int operation", [], QuantcoSeries([5]), arithmetic_operation_list),
 ])
 def test_valid_arithmetic_operations_on_series(series_name, series, operand, operators):
     valid_operations_on_series(series_name, series, operand, operators)
@@ -126,9 +127,7 @@ def test_valid_arithmetic_operations_on_series(series_name, series, operand, ope
     ("Float series boolean operation", [1.0, 2.0, 3.0], True, arithmetic_operation_list, QuantcoException, "The type of provided input is not an int or float."),
     ("Float series string operation", [1.0, 2.0, 3.0], "Test", arithmetic_operation_list, QuantcoException, "The type of provided input is not an int or float."),
     ("String series float operation", ["Test", "Test1"], 2.0, arithmetic_operation_list, QuantcoException, "The operand type <class 'float'> is not compatible with the series type <class 'str'>."),
-    ("String series None operation", ["Test", "Test1"], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not compatible with the series type <class 'str'>."),
     ("Boolean series Boolean operation", [True, False, None], False, arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
-    ("Boolean series None operation", [True, False, None], None, arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
     ("Float series with none int operation", [1.0, 2.0, 3.0, None], 2, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
     ("Float series with none float operation", [1.0, 2.0, 3.0, None], 2.0, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'float'"),
     ("Int series with none int operation", [None, 1, 3, None], 2, arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
@@ -142,9 +141,7 @@ def test_valid_arithmetic_operations_on_series(series_name, series, operand, ope
     ("Float series boolean operation, series", [1.0, 2.0, 3.0], QuantcoSeries([True]*3), arithmetic_operation_list, QuantcoException, "The type of provided input is not an int or float."),
     ("Float series string operation, series", [1.0, 2.0, 3.0], QuantcoSeries(["Test"]*3), arithmetic_operation_list, QuantcoException, "The type of provided input is not an int or float."),
     ("String series float operation, series", ["Test", "Test1"], QuantcoSeries([2.0]*2), arithmetic_operation_list, QuantcoException, "The operand type <class 'float'> is not compatible with the series type <class 'str'>."),
-    ("String series None operation, series", ["Test", "Test1"], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not compatible with the series type <class 'str'>."),
     ("Boolean series Boolean operation, series", [True, False, None], QuantcoSeries([False]*3), arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
-    ("Boolean series None operation, series", [True, False, None], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
     ("Float series with none int operation, series", [1.0, 2.0, 3.0, None], QuantcoSeries([2]*4), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
     ("Float series with none float operation, series", [1.0, 2.0, 3.0, None], QuantcoSeries([2.0]*4), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'float'"),
     ("Int series with none int operation, series", [None, 1, 3, None], QuantcoSeries([2]*4), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
@@ -153,7 +150,17 @@ def test_valid_arithmetic_operations_on_series(series_name, series, operand, ope
     ("None series with String operation, series", [None, None], QuantcoSeries(["1"]*2), [sub, truediv], TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'str'"),
     ("String series with String multiplication, series", ["Test", "Test2"], QuantcoSeries(["1"]*2), [mul], TypeError, "can't multiply sequence by non-int of type 'str'"),
     ("None series with String multiplication, series", [None, None], QuantcoSeries(["1"]*2), [mul], TypeError, "can't multiply sequence by non-int of type 'NoneType'"),
-    ("None series with int operation, series", [None, None], QuantcoSeries([1]*2), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'")
+    ("None series with int operation, series", [None, None], QuantcoSeries([1]*2), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
+
+    # Comment line 155-158 and uncomment line 159-162 to enable arithmetic operation on NoneType
+    ("Boolean series None operation", [True, False, None], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
+    ("Boolean series None operation, series", [True, False, None], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
+    ("String series None operation", ["Test", "Test1"], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
+    ("String series None operation, series", ["Test", "Test1"], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
+    #("Boolean series None operation", [True, False, None], None, arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
+    #("Boolean series None operation, series", [True, False, None], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "Addition on the bool type is not supported."),
+    #("String series None operation", ["Test", "Test1"], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not compatible with the series type <class 'str'>."),
+    #("String series None operation, series", ["Test", "Test1"], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not compatible with the series type <class 'str'>."),
 ])
 def test_invalid_arithmetic_operations_on_series(series_name:str, series:List[Any], operand:Any, operators:List[Any], exception_type:Exception, error_message:str):
     invalid_operations_on_series(series_name, series, operand, operators, exception_type, error_message)
