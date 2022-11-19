@@ -33,30 +33,28 @@ def test_valid_series(series_name, series, series_type):
     # Given
 
     # When
-    quantco_series = QuantcoSeries(series_name=series_name, series_list=series)
+    quantco_series = QuantcoSeries(series_list=series)
     
     # Then
     assert quantco_series.series == series
-    assert quantco_series.series_name == series_name
     assert quantco_series._type == series_type
     assert len(quantco_series) == len(series)
-    assert repr(quantco_series) == f"QuantcoSeries(len={len(series)}, series_name={series_name}, series={series}, type={series_type})"
-    assert quantco_series.__str__() == f"QuantcoSeries(len={len(series)}, series_name={series_name}, series={series}, type={series_type})"
+    assert repr(quantco_series) == f"QuantcoSeries(len={len(series)}, series={series}, type={series_type})"
+    assert quantco_series.__str__() == f"QuantcoSeries(len={len(series)}, series={series}, type={series_type})"
 
 @pytest.mark.parametrize("series_name, series, error_message",[
-    ("None Series", None, "The series_name or series can't be None"),
-    (None, ["Test"], "The series_name or series can't be None"),
-    ("List of List", [[]], "The type of elements in the series 'List of List' are not allowed. The allowed types are: String, Boolean, Int and Float."),
-    ("Mixed Series of type", [False, "Test", 1.2], "The elements in the series 'Mixed Series of type' are not of same type."),
-    ("Mixed Series with List", [1.0,[],3.0], "The type of elements in the series 'Mixed Series with List' are not allowed. The allowed types are: String, Boolean, Int and Float."),
-    ("Mixed Series with Int and Float", [1,2,3,4.0,5.0], "The elements in the series 'Mixed Series with Int and Float' are not of same type.")
+    ("None Series", None, "The series can't be None"),
+    ("List of List", [[]], "The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float."),
+    ("Mixed Series of type", [False, "Test", 1.2], "The elements in the series are not of same type."),
+    ("Mixed Series with List", [1.0,[],3.0], "The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float."),
+    ("Mixed Series with Int and Float", [1,2,3,4.0,5.0], "The elements in the series are not of same type.")
 ])
 def test_invalid_series(series_name, series, error_message):
     # Given
 
     # When
     with pytest.raises(QuantcoException) as e:
-        QuantcoSeries(series_name, series)
+        QuantcoSeries(series)
     
     # Then
     assert e.value.args[0] == error_message
@@ -68,7 +66,7 @@ def test_invalid_series(series_name, series, error_message):
 ])
 def test_setter_for_series(series_name, series, setter_attr, setter_value):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     # When
     with pytest.raises(AttributeError) as e:
@@ -79,14 +77,13 @@ def test_setter_for_series(series_name, series, setter_attr, setter_value):
 
 def valid_operations_on_series(series_name, series, operand, operators):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     for operator in operators:
         # When
         calculated_quantco_series = operator(quantco_series, operand)
         # Then
         assert len(calculated_quantco_series.series) == len(series)
-        assert calculated_quantco_series.series_name == series_name
         for i in range(len(series)):
             if type(operand) == list:
                 assert calculated_quantco_series.series[i] == operator(series[i], operand[i])
@@ -95,7 +92,7 @@ def valid_operations_on_series(series_name, series, operand, operators):
 
 def invalid_operations_on_series(series_name:str, series:List[Any], operand:Any, operators:List[Any], exception_type:Exception, error_message:str):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     for operator in operators:
         # When
@@ -226,7 +223,7 @@ bitwise_uniary_operator_list = [invert]
 ])
 def test_valid_bitwise_uniary_operations_on_series(series_name, series, operators):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     for operator in operators:
         # When
@@ -234,7 +231,6 @@ def test_valid_bitwise_uniary_operations_on_series(series_name, series, operator
 
         # Then
         assert len(calculated_quantco_series.series) == len(series)
-        assert calculated_quantco_series.series_name == series_name
         for i in range(len(series)):
                 assert calculated_quantco_series.series[i] == (not series[i])
 
@@ -246,7 +242,7 @@ def test_valid_bitwise_uniary_operations_on_series(series_name, series, operator
 ])
 def test_invalid_bitwise_uniary_operations_on_series(series_name, series, operators, exception_type, error_message):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     for operator in operators:
         # When
@@ -269,14 +265,13 @@ def test_invalid_bitwise_uniary_operations_on_series(series_name, series, operat
 ])
 def test_get_item_valid_series(series_name, series, filter, expectation):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     # When
     result = quantco_series[filter]
 
     # Then
     if type(result) == QuantcoSeries:
-        assert result.series_name == "filtered_series"
         assert result.series == expectation
     else:
         assert result == expectation
@@ -292,7 +287,7 @@ def test_get_item_valid_series(series_name, series, filter, expectation):
 ])
 def test_get_item_invalid_series(series_name, series, filter, exception, error_message):
     # Given
-    quantco_series = QuantcoSeries(series_name, series)
+    quantco_series = QuantcoSeries(series)
 
     # When
     with pytest.raises(exception) as e:

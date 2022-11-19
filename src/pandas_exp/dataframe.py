@@ -16,7 +16,7 @@ class QuantcoDataFrame(object):
     
     def __getitem__(self, key):
         if type(key) == list or type(key) == QuantcoSeries:
-            filter_series = QuantcoSeries.convert_to_quantco_series(key, "filter_series")
+            filter_series = QuantcoSeries.convert_to_quantco_series(key)
             new_frame = dict()
             for k,v in self._frame.items():
                 new_frame[k] = v[filter_series]
@@ -50,7 +50,7 @@ class QuantcoDataFrame(object):
         for k,v in frame_dict.items():
             if type(v) == QuantcoSeries:
                 v = v.series
-            frame[k] = QuantcoSeries(k, v)
+            frame[k] = QuantcoSeries(v)
         return frame
 
     def size(self):

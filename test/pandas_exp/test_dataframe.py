@@ -71,21 +71,21 @@ def test_valid_quantcoframes(data_frame, size):
             'Test' : ["Test", None],
             'Number': [0.1, "Test"]
         },
-        "The elements in the series 'Number' are not of same type."
+        "The elements in the series are not of same type."
     ),
     (
         {
             'Test' : ["Test", "Test1"],
             'Number': [0.1, [0.1]]
         },
-        "The type of elements in the series 'Number' are not allowed. The allowed types are: String, Boolean, Int and Float."
+        "The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float."
     ),
     (
         {
             'Test' : ["Test"],
             'Number': [[0.1]]
         },
-        "The type of elements in the series 'Number' are not allowed. The allowed types are: String, Boolean, Int and Float."
+        "The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float."
     ),
     (
         {
@@ -179,7 +179,6 @@ def test_valid_read_operator_for_quantcoframes(data_frame, series_name, expected
     result = quantoco_dataframe[series_name]
 
     # Then
-    assert result.series_name == series_name
     assert len(result.series) == len(expected_series)
     for i in range(len(expected_series)):
         assert result.series[i] == expected_series[i]
@@ -289,7 +288,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name' : ["Test", "Test"],
             'Number': [0.1, 0.2]
         }, 
-        QuantcoSeries("filter_series", [True, True]),
+        QuantcoSeries([True, True]),
         {
             'Name' : ["Test", "Test"],
             'Number': [0.1, 0.2]
@@ -301,7 +300,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name' : ["Test", "Test2"],
             'Number' : [None, None]
         }, 
-        QuantcoSeries("filter_series",[True, False]),
+        QuantcoSeries([True, False]),
         {
             'Name' : ["Test"],
             'Number' : [None]
@@ -313,7 +312,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name' : ["Test", None],
             'Number': [0.1, 0.2]
         }, 
-        QuantcoSeries("filter_series",[False, False]),
+        QuantcoSeries([False, False]),
         {
             'Name' : [],
             'Number': []
@@ -325,7 +324,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name': ["Test", "None", "QuantCo", None],
             'Number': [1.2, 3.2, 55.2, 88.90]
         }, 
-        QuantcoSeries("filter_series", [True, None, False, True]),
+        QuantcoSeries([True, None, False, True]),
         {
             'Name': ["Test", None],
             'Number': [1.2, 88.90]
@@ -337,7 +336,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name': [False, None, None, False],
             'Number': [1.2, 3.2, 55.2, None]
         },
-        QuantcoSeries("filter_series", [True, None, True, True]),
+        QuantcoSeries([True, None, True, True]),
         {
             'Name': [False, None, False],
             'Number': [1.2, 55.2, None]
@@ -349,7 +348,7 @@ def test_invalid_read_operator_for_quantcoframes(data_frame, series_name, except
             'Name' : ["Test", "Test1", "Test2", None],
             'Number': [23.0, 34.8, 32.78, 98.343]
         }, 
-        QuantcoSeries("filter_series", [None, None, None, None]),
+        QuantcoSeries([None, None, None, None]),
         {
             'Name': [],
             'Number': []
@@ -376,7 +375,7 @@ def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list
             'Name' : [],
             'Number': []
         }, 
-        QuantcoSeries("filter_series", [None, None]),
+        QuantcoSeries([None, None]),
         QuantcoException,
         "The length of the series and the filter list/series is not equal."
     ),
@@ -385,7 +384,7 @@ def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list
             'Name' : ["Test", "Test1", "Test2", None],
             'Number': [23.0, 34.8, 32.78, 98.343]
         }, 
-        QuantcoSeries("filter_series", [2,1,1,1]),
+        QuantcoSeries([2,1,1,1]),
         QuantcoException,
         "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'int'>."
     ),
@@ -394,7 +393,7 @@ def test_valid_read_operator_with_list_for_quantcoframes(data_frame, series_list
             'Name' : ["Test", "Test1", "Test2", None],
             'Number': [23.0, 34.8, 32.78, 98.343]
         }, 
-        QuantcoSeries("filter_series", ["2","1","1"]),
+        QuantcoSeries(["2","1","1"]),
         QuantcoException,
         "Unsupported operation. The filtering on the series works on bool type series/list. The provided type is <class 'str'>."
     ),

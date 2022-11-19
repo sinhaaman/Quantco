@@ -3,14 +3,9 @@ from pandas_exp.exception import QuantcoException
 class QuantcoSeries(object):
     allowed_data_types = {str, bool, int, float, type(None)}
 
-    def __init__(self, series_name, series_list, **kwargs) -> None:
+    def __init__(self, series_list, **kwargs) -> None:
         self._series = series_list
-        self._series_name = series_name
-        self._type = self.__check_type_of_each_element_same__(series_name, series_list)
-    
-    @property
-    def series_name(self):
-        return self._series_name
+        self._type = self.__check_type_of_each_element_same__(series_list)
     
     @property
     def series(self):
@@ -24,7 +19,7 @@ class QuantcoSeries(object):
         return len(self._series)
     
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(len={len(self)}, series_name={self._series_name}, series={self._series}, type={self._type})"
+        return f"{self.__class__.__name__}(len={len(self)}, series={self._series}, type={self._type})"
     
     def __getitem__(self, access):
         if type(access) == int:
@@ -39,17 +34,17 @@ class QuantcoSeries(object):
             raise QuantcoException(f"Unsupported operation. The filtering on the series works on bool type series/list. The provided type is {filter_list.type}.")
         if len(filter_list.series) != len(self._series):
             raise QuantcoException(f"The length of the series and the filter list/series is not equal.")
-        return QuantcoSeries("filtered_series", [self._series[i] for i in range(len(filter_list.series)) if filter_list.series[i]])
+        return QuantcoSeries([self._series[i] for i in range(len(filter_list.series)) if filter_list.series[i]])
 
-    def __check_type_of_each_element_same__(self, series_name, list_to_check, **kwargs):
+    def __check_type_of_each_element_same__(self, list_to_check, **kwargs):
         list_type = type(None)
-        if list_to_check is None or series_name is None:
-            raise QuantcoException(f"The series_name or series can't be None")
+        if list_to_check is None:
+            raise QuantcoException(f"The series can't be None")
         for i in range(0, len(list_to_check)):
             if type(list_to_check[i]) not in self.allowed_data_types:
-                raise QuantcoException(f"The type of elements in the series '{series_name}' are not allowed. The allowed types are: String, Boolean, Int and Float.")
+                raise QuantcoException(f"The type of elements in the series are not allowed. The allowed types are: String, Boolean, Int and Float.")
             if list_to_check[i] != None and i-1>=0 and list_to_check[i-1] != None and type(list_to_check[i-1]) != type(list_to_check[i]):
-                raise QuantcoException(f"The elements in the series '{series_name}' are not of same type.")
+                raise QuantcoException(f"The elements in the series are not of same type.")
             if list_type == type(None) and list_to_check[i]!= None:
                 list_type = type(list_to_check[i])
 
@@ -71,43 +66,43 @@ class QuantcoSeries(object):
 
     def __add__(self, operand, **kwargs):
         self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries(self._series_name, [elem + operand for elem in self._series])
+        return QuantcoSeries([elem + operand for elem in self._series])
     
     def __sub__(self, operand, **kwargs):
         self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries(self._series_name, [elem - operand for elem in self._series])
+        return QuantcoSeries([elem - operand for elem in self._series])
     
     def __mul__(self, operand, **kwargs):
         self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries(self._series_name, [elem * operand for elem in self._series])
+        return QuantcoSeries([elem * operand for elem in self._series])
     
     def __truediv__(self, operand, **kwargs):
         return self.__div__(operand)
 
     def __div__(self, operand, **kwargs):
         self.__check_arithmetic_compatibility__(type(operand))
-        return QuantcoSeries(self._series_name, [elem / operand for elem in self._series])
+        return QuantcoSeries([elem / operand for elem in self._series])
     
     # Comparison operations overloading:
     # Should work on Series operand also
     
     def __ge__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem >= operand for elem in self._series ])
+        return QuantcoSeries([elem >= operand for elem in self._series ])
     
     def __gt__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem > operand for elem in self._series ])
+        return QuantcoSeries([elem > operand for elem in self._series ])
     
     def __le__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem <= operand for elem in self._series ])
+        return QuantcoSeries([elem <= operand for elem in self._series ])
     
     def __lt__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem < operand for elem in self._series ])
+        return QuantcoSeries([elem < operand for elem in self._series ])
     
     def __eq__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem == operand for elem in self._series ])
+        return QuantcoSeries([elem == operand for elem in self._series ])
     
     def __ne__(self, operand, **kwargs):
-        return QuantcoSeries(self._series_name, [elem != operand for elem in self._series ])
+        return QuantcoSeries([elem != operand for elem in self._series ])
     
     # List comptabile function overloading:
     def __check_list_compatibility__(self, operand_list, **kwargs):
@@ -124,30 +119,30 @@ class QuantcoSeries(object):
     def __and__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
         self.__check_list_compatibility__(operand)
-        return QuantcoSeries(self._series_name, [self._series[i] & operand.series[i] for i in range(len(self._series))])
+        return QuantcoSeries([self._series[i] & operand.series[i] for i in range(len(self._series))])
     
     def __or__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
         self.__check_list_compatibility__(operand)
-        return QuantcoSeries(self._series_name, [self._series[i] | operand.series[i] for i in range(len(self._series))])
+        return QuantcoSeries([self._series[i] | operand.series[i] for i in range(len(self._series))])
     
     def __xor__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
         self.__check_list_compatibility__(operand)
-        return QuantcoSeries(self._series_name, [self._series[i] ^ operand.series[i] for i in range(len(self._series))])
+        return QuantcoSeries([self._series[i] ^ operand.series[i] for i in range(len(self._series))])
     
     def __invert__(self, **kwargs):
         if self._type == bool:
-            return QuantcoSeries(self._series_name, [not self._series[i] for i in range(len(self._series))])
+            return QuantcoSeries([not self._series[i] for i in range(len(self._series))])
         elif len(self._series) == 0:
-            return QuantcoSeries(self._series_name, self._series)
+            return QuantcoSeries(self._series)
         else:
             raise QuantcoException(f"The invert operation of the series with type {self._type} is not supported.")
     
-    def convert_to_quantco_series(operand_list, series_name="operand_list", **kwargs):
+    def convert_to_quantco_series(operand_list, **kwargs):
         operand_list_type = type(operand_list)
         if operand_list_type != list and operand_list_type != QuantcoSeries:
             raise QuantcoException(f"The operand list provided in not of type list or QuantcoSeries.")
         if operand_list_type == list:
-            operand_list = QuantcoSeries(series_name, operand_list)
+            operand_list = QuantcoSeries(operand_list)
         return operand_list
