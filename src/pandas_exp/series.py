@@ -104,30 +104,33 @@ class QuantcoSeries(object):
         return QuantcoSeries([elem != operand for elem in self._series ])
     
     # List comptabile function overloading:
-    def __check_list_compatibility__(self, operand_list, **kwargs):
+    def __check_boolean_operator_compatibility__(self, operand_list, **kwargs):
         operand_list_type = operand_list.type
-        if operand_list_type == float or self.type == float:
-            raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list.")
-        if operand_list_type == str or self.type == str:
-            raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list.")
-        if operand_list_type == type(None):
-            raise QuantcoException(f"The boolean operations don't work on {operand_list_type} type operand list. Either the operand list is empty or has all None values.")
+        # Comment line 110  and uncomment line 112 to 117 to enable bitwise operator between int series.
+        if operand_list_type != bool or self._type!= bool:
+            raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list. The boolean operation work on only bool type series.")
+        # if operand_list_type == float or self.type == float:
+        #     raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list.")
+        # if operand_list_type == str or self.type == str:
+        #     raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list.")
+        # if operand_list_type == type(None):
+        #     raise QuantcoException(f"The boolean operations don't work on {operand_list_type} type operand list. Either the operand list is empty or has all None values.")
         if len(operand_list.series) != len(self._series):
             raise QuantcoException(f"The operand series or list provided is of length {len(operand_list.series)} and is not compatible for the operation with the list of length {len(self._series)}. Both the series length should be equal.")
 
     def __and__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
-        self.__check_list_compatibility__(operand)
+        self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] & operand.series[i] for i in range(len(self._series))])
     
     def __or__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
-        self.__check_list_compatibility__(operand)
+        self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] | operand.series[i] for i in range(len(self._series))])
     
     def __xor__(self, operand, **kwargs):
         operand = QuantcoSeries.convert_to_quantco_series(operand)
-        self.__check_list_compatibility__(operand)
+        self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] ^ operand.series[i] for i in range(len(self._series))])
     
     def __invert__(self, **kwargs):
