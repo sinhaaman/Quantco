@@ -152,7 +152,7 @@ def test_valid_arithmetic_operations_on_series(series_name, series, operand, ope
     ("None series with String multiplication, series", [None, None], QuantcoSeries(["1"]*2), [mul], TypeError, "can't multiply sequence by non-int of type 'NoneType'"),
     ("None series with int operation, series", [None, None], QuantcoSeries([1]*2), arithmetic_operation_list, TypeError, "unsupported operand type(s) for {operator_symbol}: 'NoneType' and 'int'"),
 
-    # Comment line 155-158 and uncomment line 159-162 to enable arithmetic operation on NoneType
+    # Comment line 156-159 and uncomment line 160-163 to enable arithmetic operation on NoneType
     ("Boolean series None operation", [True, False, None], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
     ("Boolean series None operation, series", [True, False, None], QuantcoSeries([None]*3), arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),
     ("String series None operation", ["Test", "Test1"], None, arithmetic_operation_list, QuantcoException, "The operand type <class 'NoneType'> is not supported."),

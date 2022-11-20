@@ -55,7 +55,7 @@ class QuantcoSeries(object):
     # Arithmetic operations overloading:
     def __check_arithmetic_compatibility__(self, operand_type, **kwargs):
         arithmetic_types = {int, float}
-        # Comment lines 60-61 to support arithmetic operations on NoneType.
+        # Comment lines 59-60 to support arithmetic operations on NoneType.
         if operand_type == type(None):
             raise QuantcoException(f"The operand type {operand_type} is not supported.")
         if self._type in arithmetic_types:
@@ -123,7 +123,7 @@ class QuantcoSeries(object):
     # List comptabile function overloading:
     def __check_boolean_operator_compatibility__(self, operand_list, **kwargs):
         operand_list_type = operand_list.type
-        # Comment line 110  and uncomment line 112 to 117 to enable bitwise operator between int series.
+        # Comment line 127-128  and uncomment line 129 to 134 to enable bitwise operator between int series.
         if operand_list_type != bool or self._type!= bool:
             raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list. The boolean operation work on only bool type series.")
         # if operand_list_type == float or self.type == float:

@@ -94,7 +94,8 @@ def test_valid_quantcoframes(data_frame, size):
             'Size': [0.1]
         },
         "The length of the series are not equal."
-    )
+    ),
+    (None, "The frame dictionary can't be None"),
 ])
 def test_invalid_quantcoframes(data_frame, error_message):
     # Given

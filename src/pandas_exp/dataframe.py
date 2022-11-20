@@ -34,6 +34,7 @@ class QuantcoDataFrame(object):
         frame = dict()
         try :
             if frame_dict != {}:
+                self.__validate_frame_not_none__(frame_dict)
                 self.__validate_frame__(frame_dict)
                 frame = self.__construct_frame__(frame_dict)
                 self.rows = len(frame_dict.values().__iter__().__next__())
@@ -56,6 +57,10 @@ class QuantcoDataFrame(object):
     def size(self):
         return self.rows,self.columns
     
+    def __validate_frame_not_none__(self, frame_dict:Dict[str, List[Any]]):
+        if frame_dict is None:
+            raise QuantcoException("The frame dictionary can't be None")
+
     def __validate_frame__(self, frame_dict:Dict[str, List[Any]]):
         item1_k,item1_v = frame_dict.items().__iter__().__next__()
         for k,v in frame_dict.items():
