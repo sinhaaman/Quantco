@@ -25,7 +25,7 @@ class QuantcoSeries(object):
         if type(access) == int:
             return self._series[access]
         elif type(access) == list or type(access) == QuantcoSeries:
-            return self.__filter_series__(QuantcoSeries.convert_to_quantco_series(access))
+            return self.__filter_series__(QuantcoSeries.convert_list_to_quantco_series(access))
         else:
             raise QuantcoException(f"Unsupported operation. Accessibility of the series could be performed only using an integer or list of boolean values.")
     
@@ -65,14 +65,6 @@ class QuantcoSeries(object):
             raise QuantcoException("Addition on the bool type is not supported.")
         elif self._type != type(None) and operand_type != self._type:
             raise QuantcoException(f"The operand type {operand_type} is not compatible with the series type {self._type}.")
-    
-    def __convert_object_to_quantco_series__(self, __o):
-        object_type = type(__o)
-        if object_type != list and object_type != QuantcoSeries:
-            __o = QuantcoSeries.convert_to_quantco_series([__o] * len(self._series))
-        if (len(__o) != len(self._series)) and (__o.type != type(None) and self._type != type(None)):
-            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(__o)} and {len(self)}")
-        return __o
 
     def __convert_arithmetric_operand__(self, operand):
         operand = self.__convert_object_to_quantco_series__(operand)
@@ -123,7 +115,7 @@ class QuantcoSeries(object):
     # List comptabile function overloading:
     def __check_boolean_operator_compatibility__(self, operand_list, **kwargs):
         operand_list_type = operand_list.type
-        # Comment line 127-128  and uncomment line 129 to 134 to enable bitwise operator between int series.
+        # Comment line 119-120  and uncomment line 121 to 126 to enable bitwise operator between int series.
         if operand_list_type != bool or self._type!= bool:
             raise QuantcoException(f"The boolean operations don't work on {self.type} type series and {operand_list_type} type operand list. The boolean operation work on only bool type series.")
         # if operand_list_type == float or self.type == float:
@@ -136,17 +128,17 @@ class QuantcoSeries(object):
             raise QuantcoException(f"The operand series or list provided is of length {len(operand_list.series)} and is not compatible for the operation with the list of length {len(self._series)}. Both the series length should be equal.")
 
     def __and__(self, operand, **kwargs):
-        operand = QuantcoSeries.convert_to_quantco_series(operand)
+        operand = QuantcoSeries.convert_list_to_quantco_series(operand)
         self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] & operand.series[i] for i in range(len(self._series))])
     
     def __or__(self, operand, **kwargs):
-        operand = QuantcoSeries.convert_to_quantco_series(operand)
+        operand = QuantcoSeries.convert_list_to_quantco_series(operand)
         self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] | operand.series[i] for i in range(len(self._series))])
     
     def __xor__(self, operand, **kwargs):
-        operand = QuantcoSeries.convert_to_quantco_series(operand)
+        operand = QuantcoSeries.convert_list_to_quantco_series(operand)
         self.__check_boolean_operator_compatibility__(operand)
         return QuantcoSeries([self._series[i] ^ operand.series[i] for i in range(len(self._series))])
     
@@ -158,15 +150,26 @@ class QuantcoSeries(object):
         else:
             raise QuantcoException(f"The invert operation of the series with type {self._type} is not supported.")
     
-    def __eq__(self, __o: object) -> bool:
-        __o = QuantcoSeries.convert_to_quantco_series(__o)
-        if __o.type != self.type:
-            raise QuantcoException(f"The series types are not same. The series are of types: {self._type} and {__o.type}.")
-        if len(__o.series) != len(self._series):
-            raise QuantcoException(f"The length of series are not equal. The series are of length {len(self._series)} and {len(__o.series)}.")
-        return __o.series == self._series
+    def __eq__(self, operand: object) -> bool:
+        operand = self.__convert_object_to_quantco_series__(operand)
+        # Comment lines 156-157 to perform element-wise equality between 2 series.
+        # if operand.type != self.type:
+        #     raise QuantcoException(f"The series types are not same. The series are of types: {self._type} and {operand.type}.")
+        if len(operand.series) != len(self._series):
+            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(self._series)} and {len(operand.series)}.")
+        return QuantcoSeries([self._series[i] == operand.series[i] for i in range(len(self._series))])
     
-    def convert_to_quantco_series(__o:object, **kwargs):
+    def __convert_object_to_quantco_series__(self, __o):
+        object_type = type(__o)
+        if object_type != list and object_type != QuantcoSeries:
+            __o = QuantcoSeries.convert_list_to_quantco_series([__o] * len(self._series))
+        elif object_type == list:
+            __o = QuantcoSeries.convert_list_to_quantco_series(__o)
+        if (len(__o) != len(self._series)) and (__o.type != type(None) and self._type != type(None)):
+            raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(self._series)} and {len(__o.series)}.")
+        return __o
+
+    def convert_list_to_quantco_series(__o:object, **kwargs):
         operand_list_type = type(__o)
         if operand_list_type != list and operand_list_type != QuantcoSeries:
             raise QuantcoException(f"The operand list provided in not of type list or QuantcoSeries.")

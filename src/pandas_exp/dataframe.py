@@ -8,7 +8,6 @@ class QuantcoDataFrame(object):
 
     def __init__(self, frame_dict:Dict[str, List[Union[str, bool, int, float]]]={}) -> None:
         self._frame = self.initialize_frame(frame_dict)
-        print(f"Dataframe initialized with the size: {self.size()}")
 
     @property
     def frame(self):
@@ -16,7 +15,7 @@ class QuantcoDataFrame(object):
     
     def __getitem__(self, key):
         if type(key) == list or type(key) == QuantcoSeries:
-            filter_series = QuantcoSeries.convert_to_quantco_series(key)
+            filter_series = QuantcoSeries.convert_list_to_quantco_series(key)
             new_frame = dict()
             for k,v in self._frame.items():
                 new_frame[k] = v[filter_series]
