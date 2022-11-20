@@ -153,8 +153,8 @@ class QuantcoSeries(object):
     def __eq__(self, operand: object) -> bool:
         operand = self.__convert_object_to_quantco_series__(operand)
         # Comment lines 156-157 to perform element-wise equality between 2 series.
-        # if operand.type != self.type:
-        #     raise QuantcoException(f"The series types are not same. The series are of types: {self._type} and {operand.type}.")
+        if operand.type != self.type:
+            raise QuantcoException(f"The series types are not same. The series are of types: {self._type} and {operand.type}.")
         if len(operand.series) != len(self._series):
             raise QuantcoException(f"The length of the series provided are not equal. The lengths are {len(self._series)} and {len(operand.series)}.")
         return QuantcoSeries([self._series[i] == operand.series[i] for i in range(len(self._series))])

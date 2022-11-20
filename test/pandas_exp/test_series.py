@@ -225,9 +225,9 @@ def test_invalid_comparison_operations_on_series(series_name:str, series:List[An
     ("Float series with None, comparison with float list", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None]),
     ("Int series", [1, 2, 3, 4, None], [1, 2, 3, 4, None]),
     ("None series comparison with None series", [None], [None]),
-    ("None series comparison with None series", [1.0, 2.0, 3.0, None], [1.0, 2.0, 4.0, None]),
-    ("None series comparison with None series", [1, 2, 3, None], [1, 2, 4, None]),
-    ("None series comparison with None series", [True, True], [True, None]),
+    ("Float series comparison with Float series", [1.0, 2.0, 3.0, None], [1.0, 2.0, 4.0, None]),
+    ("Int series comparison with Int series", [1, 2, 3, None], [1, 2, 4, None]),
+    ("Boolean series comparison with Boolean series", [True, True], [True, None]),
     ("Float series with None, comparison with float list", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 3.0, None])),
     ("None series comparison with None series", [None], QuantcoSeries([None])),
     ("None series comparison with None series", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 4.0, None])),
@@ -236,9 +236,12 @@ def test_invalid_comparison_operations_on_series(series_name:str, series:List[An
     ("Float series with None, comparison with float number", [1.0, 2.0, 3.0, None], 1.0),
     ("Int series", [1, 2, 3, 4, None], 1),
     ("None series comparison with None series", [None], None),
-    ("None series comparison with None series", [1.0, 2.0, 3.0, None], True),
-    ("None series comparison with None series", [1, 2, 3, None], None),
-    ("None series comparison with None series", [True, True], None),
+    ("Series with None, comparison with None operation", [None, None, None, None], None),
+
+    # Uncomment the following test cases to perform equality between two different types of series.
+    # ("None series comparison with True", [1.0, 2.0, 3.0, None], True),
+    # ("None series comparison with None", [1, 2, 3, None], None),
+    # ("Boolean series comparison with None", [True, True], None),
 ])
 def test_valid_equality_on_series(series_name, series, other_series):
     # Given
@@ -249,6 +252,7 @@ def test_valid_equality_on_series(series_name, series, other_series):
 
     # Then
     assert len(list_result) == len(series)
+    assert type(list_result) == QuantcoSeries
     for i in range(len(series)):
         if type(other_series) == list or type(other_series) == QuantcoSeries:
             assert list_result[i] == (series[i] == other_series[i])
@@ -257,24 +261,39 @@ def test_valid_equality_on_series(series_name, series, other_series):
 
 
 @pytest.mark.parametrize("series_name, series, other_series, exception, error_message",[
-    # ("String series with None, comparison with None operation", ["Test", "Test1", "Test", None], None, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
-    # ("String series with None, comparison with Boolean operation", ["Test", "Test1", "Test", None], True, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
-    # ("Series with None, comparison with None operation", [None, None, None, None], None, QuantcoException, "The operand list provided in not of type list or QuantcoSeries."),
-    # ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of series are not equal. The series are of length 4 and 5."),
-    # ("Float series with None, comparison with int list", [1.0, 2.0, 3.0, None], [1, 2, 3, None], QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'int'>."),
-    # ("Float series with None, comparison with String list", [1.0, 2.0, 3.0, None], ["1", None], QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'str'>."),
-    # ("Boolean series with None, comparison with string operation", [True, False, None], ["True", "False"], QuantcoException, "The series types are not same. The series are of types: <class 'bool'> and <class 'str'>."),
-    # ("String series with None, comparison with boolean series", ["True", "False", "True", "False", None], [True, True, True, True, True], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'bool'>."),
-    # ("String series filtered with None", ["True", "False", "True", "False", None], [None, None, None, None, None], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'NoneType'>."),
-    # ("None series", [None, None, None, None], [True, False, False, False], QuantcoException, "The series types are not same. The series are of types: <class 'NoneType'> and <class 'bool'>."),
-
-    # Uncomment the following lines to implement the equality between different types of series.
-    ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
     ("Boolean series with None, comparison with string operation", [True, False, None], ["True", "False"], QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 2."),
-    ("Boolean series with None, comparison with string operation", [True, False, None], [None], QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 1."),
-    ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 3.0, None, None]), QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
     ("Boolean series with None, comparison with string operation", [True, False, None], QuantcoSeries(["True", "False"]), QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 2."),
-    ("Boolean series with None, comparison with string operation", [True, False, None], QuantcoSeries([None]), QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 1.")
+    ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    ("Float series with None, comparison with float series of different size", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 3.0, None, None]), QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    ("Float series with None, comparison with float series of different size", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 3.0, None, None]), QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    ("Float series with None, comparison with String list", [1.0, 2.0, 3.0, None], ["1", None], QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 2."),
+    ("Float series with None, comparison with String list", [1.0, 2.0, 3.0, None], QuantcoSeries(["1", None]), QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 2."),
+
+    # Comment the lines from 274-288 to implement the equality between different types of series.
+    ("Boolean series with None, comparison with string operation", [True, False, None], [None], QuantcoException, "The series types are not same. The series are of types: <class 'bool'> and <class 'NoneType'>."),
+    ("Boolean series with None, comparison with string operation", [True, False, None], QuantcoSeries([None]), QuantcoException, "The series types are not same. The series are of types: <class 'bool'> and <class 'NoneType'>."),
+    ("Float series with None, comparison with int list", [1.0, 2.0, 3.0, None], [1, 2, 3, None], QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'int'>."),
+    ("String series with None, comparison with boolean series", ["True", "False", "True", "False", None], [True, True, True, True, True], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'bool'>."),
+    ("String series filtered with None", ["True", "False", "True", "False", None], [None, None, None, None, None], QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'NoneType'>."),
+    ("None series", [None, None, None, None], [True, False, False, False], QuantcoException, "The series types are not same. The series are of types: <class 'NoneType'> and <class 'bool'>."),
+    ("Int series with None, comparison with float list of different size", [1, 2, 3, None], QuantcoSeries([1.0, 2.0, 3.0, None]), QuantcoException, "The series types are not same. The series are of types: <class 'int'> and <class 'float'>."),
+    ("Float series with None, comparison with int list", [1.0, 2.0, 3.0, None], QuantcoSeries([1, 2, 3, None]), QuantcoException, "The series types are not same. The series are of types: <class 'float'> and <class 'int'>."),
+    ("String series with None, comparison with boolean series", ["True", "False", "True", "False", None], QuantcoSeries([True, True, True, True, True]), QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'bool'>."),
+    ("String series filtered with None", ["True", "False", "True", "False", None], QuantcoSeries([None, None, None, None, None]), QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'NoneType'>."),
+    ("None series with Boolean series", [None, None, None, None], QuantcoSeries([True, False, False, False]), QuantcoException, "The series types are not same. The series are of types: <class 'NoneType'> and <class 'bool'>."),
+    ("String series with None, comparison with None syntactic sugar", ["Test", "Test1", "Test", None], None, QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'NoneType'>."),
+    ("String series with None, comparison with Boolean syntactic sugar", ["Test", "Test1", "Test", None], True, QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'bool'>."),
+    ("String series with None, comparison with int syntactic sugar", ["Test", "Test1", "Test", None], 1, QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'int'>."),
+    ("String series with None, comparison with float syntactic sugar", ["Test", "Test1", "Test", None], 2.3, QuantcoException, "The series types are not same. The series are of types: <class 'str'> and <class 'float'>."),
+    
+    # Uncomment the following lines to implement the equality between different types of series.
+    # ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], [1.0, 2.0, 3.0, None, None], QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    # ("Boolean series with None, comparison with string operation", [True, False, None], ["True", "False"], QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 2."),
+    # ("Boolean series with None, comparison with string operation", [True, False, None], [None], QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 1."),
+    # ("Float series with None, comparison with float list of different size", [1.0, 2.0, 3.0, None], QuantcoSeries([1.0, 2.0, 3.0, None, None]), QuantcoException, "The length of the series provided are not equal. The lengths are 4 and 5."),
+    # ("Boolean series with None, comparison with string operation", [True, False, None], QuantcoSeries(["True", "False"]), QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 2."),
+    # ("Boolean series with None, comparison with string operation", [True, False, None], QuantcoSeries([None]), QuantcoException, "The length of the series provided are not equal. The lengths are 3 and 1.")
 ])
 def test_invalid_equality_on_series(series_name, series, other_series, exception, error_message):
     # Given
