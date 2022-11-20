@@ -16,7 +16,6 @@ def test_quantco_example():
     assert type(result1) == QuantcoSeries
     assert result1.series == df_dict["price"]
     assert result1.type == float
-    assert result1.series_name == "price"
 
     result1 = result1 + 5
     expected_result = [12.0, 8.5, 13.0, 11.0]
@@ -32,7 +31,6 @@ def test_quantco_example():
     assert type(result2) == QuantcoSeries
     assert result2.series == df_dict["sales"]
     assert result2.type == int
-    assert result2.series_name == "sales"
 
     result2 = result2 > 3
     expected_result = [True, False, False, True]
@@ -43,7 +41,6 @@ def test_quantco_example():
     assert type(result3) == QuantcoSeries
     assert result3.series == df_dict["taxed"]
     assert result3.type == bool
-    assert result3.series_name == "taxed"
 
     result3 = ~result3
     expected_result = [True, True, False, True]
@@ -53,7 +50,6 @@ def test_quantco_example():
     result4 = result1 & result2 & result3
     assert type(result4) == QuantcoSeries
     assert result4.type == bool
-    assert result4.series_name == result1.series_name
     expected_result = [True, False, False, True]
     for i in range(len(result4.series)):
         assert result4.series[i] == expected_result[i]
@@ -74,7 +70,6 @@ def test_quantco_example():
     assert type(result) == QuantcoSeries
     assert result.series == expected_result["SKU"]
     assert result.type == str
-    assert result.series_name == "SKU" 
 
 
     

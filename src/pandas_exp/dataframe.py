@@ -16,7 +16,7 @@ class QuantcoDataFrame(object):
     
     def __getitem__(self, key):
         if type(key) == list or type(key) == QuantcoSeries:
-            filter_series = QuantcoSeries.convert_to_quantco_series(key, "filter_series")
+            filter_series = QuantcoSeries.convert_to_quantco_series(key)
             new_frame = dict()
             for k,v in self._frame.items():
                 new_frame[k] = v[filter_series]
@@ -34,6 +34,7 @@ class QuantcoDataFrame(object):
         frame = dict()
         try :
             if frame_dict != {}:
+                self.__validate_frame_not_none__(frame_dict)
                 self.__validate_frame__(frame_dict)
                 frame = self.__construct_frame__(frame_dict)
                 self.rows = len(frame_dict.values().__iter__().__next__())
@@ -50,12 +51,16 @@ class QuantcoDataFrame(object):
         for k,v in frame_dict.items():
             if type(v) == QuantcoSeries:
                 v = v.series
-            frame[k] = QuantcoSeries(k, v)
+            frame[k] = QuantcoSeries(v)
         return frame
 
     def size(self):
         return self.rows,self.columns
     
+    def __validate_frame_not_none__(self, frame_dict:Dict[str, List[Any]]):
+        if frame_dict is None:
+            raise QuantcoException("The frame dictionary can't be None")
+
     def __validate_frame__(self, frame_dict:Dict[str, List[Any]]):
         item1_k,item1_v = frame_dict.items().__iter__().__next__()
         for k,v in frame_dict.items():

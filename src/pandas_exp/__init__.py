@@ -22,9 +22,7 @@ result2  = (df["price"] + 5.0 > 10.0) & (df["sales"] > 3)
 result3 = ~df["taxed"]
 result  = (df["price"] + 5.0 > 10.0) & (df["sales"] > 3) & ~df["taxed"]
 
-series = QuantcoSeries("price", [7.0, 3.5, 8.0, 6.0])
+series = QuantcoSeries([7.0, 3.5, 8.0, 6.0])
 result4 = df[result]["SKU"] 
 print(series)
 print(result)
-#df = QuantcoDataFrame(validFrame)
-#df1 = QuantcoDataFrame()
